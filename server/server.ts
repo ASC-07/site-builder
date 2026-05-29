@@ -9,10 +9,17 @@ import { stripeWebhook } from './controllers/stripeWebhook.js';
 
 const app = express();
 
-const port = 3000;
+const port = process.env.PORT || 3000;  // ✅ use Render's dynamic port
 
 const corsOptions = {
-    origin: process.env.TRUSTED_ORIGINS?.split(',') || [],
+    origin: function(origin: string | undefined, callback: Function) {
+        const allowedOrigins = process.env.TRUSTED_ORIGINS?.split(',') || [];
+        if (!origin || allowedOrigins.includes(origin)) {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
     credentials: true,
 }
 
